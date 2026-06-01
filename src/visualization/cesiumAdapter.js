@@ -15,6 +15,11 @@ const toCartesian = (sample) => {
   return Cartesian3.fromDegrees(sample.longitudeDeg, sample.latitudeDeg, sample.altitudeKm * 1000);
 };
 
+const initialOrbitRadiusKm = (mission) => {
+  const { x, y, z } = mission.initialState.positionEciKm;
+  return Math.hypot(x, y, z);
+};
+
 export const createViewer = (container) => {
   const { Ion, Viewer } = getCesium();
   Ion.defaultAccessToken = globalThis.ASTROLAB_CESIUM_ION_TOKEN ?? '';
@@ -24,7 +29,7 @@ export const createViewer = (container) => {
     baseLayerPicker: true,
     geocoder: false,
     homeButton: true,
-    infoBox: true,
+    infoBox: false,
     sceneModePicker: true,
     selectionIndicator: false,
     shouldAnimate: true,
@@ -37,8 +42,10 @@ export const loadMissionScene = (viewer, mission, samples) => {
     Cartesian3,
     ClockRange,
     Color,
+    HeadingPitchRange,
     JulianDate,
     LabelStyle,
+    Math: CesiumMath,
     PathGraphics,
     PolylineGlowMaterialProperty,
     SampledPositionProperty,
@@ -58,8 +65,11 @@ export const loadMissionScene = (viewer, mission, samples) => {
   viewer.clock.stopTime = stop.clone();
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = ClockRange.LOOP_STOP;
-  viewer.clock.multiplier = 120;
+  viewer.clock.multiplier = 60;
   viewer.timeline.zoomTo(start, stop);
+
+  const pathColor = Color.fromCssColorString(mission.visual?.pathColor ?? '#ff2bd6');
+  const groundTrackColor = Color.fromCssColorString(mission.visual?.groundTrackColor ?? '#22c55e');
 
   const satellite = viewer.entities.add({
     availability: new TimeIntervalCollection([new TimeInterval({ start, stop })]),
@@ -67,8 +77,8 @@ export const loadMissionScene = (viewer, mission, samples) => {
     description: mission.description,
     position: sampledPosition,
     point: {
-      pixelSize: 12,
-      color: Color.CYAN,
+      pixelSize: 14,
+      color: pathColor,
       outlineColor: Color.WHITE,
       outlineWidth: 2,
     },
@@ -84,12 +94,12 @@ export const loadMissionScene = (viewer, mission, samples) => {
     path: new PathGraphics({
       resolution: mission.stepSeconds,
       material: new PolylineGlowMaterialProperty({
-        glowPower: 0.2,
-        color: Color.CYAN,
+        glowPower: 0.15,
+        color: pathColor,
       }),
-      width: 3,
-      leadTime: mission.stepSeconds * 10,
-      trailTime: mission.stepSeconds * 30,
+      width: 4,
+      leadTime: 0,
+      trailTime: mission.propagatedHours * 3600,
     }),
   });
 
@@ -97,13 +107,18 @@ export const loadMissionScene = (viewer, mission, samples) => {
     name: `${mission.name} 地面轨迹`,
     polyline: {
       positions: samples.map((sample) => Cartesian3.fromDegrees(sample.longitudeDeg, sample.latitudeDeg, 0)),
-      width: 2,
-      material: Color.ORANGE.withAlpha(0.75),
+      width: 3,
+      material: groundTrackColor.withAlpha(0.9),
       clampToGround: true,
     },
   });
 
-  viewer.trackedEntity = satellite;
+  viewer.trackedEntity = undefined;
+  const viewDistanceMeters = initialOrbitRadiusKm(mission) * 1_000 * 4;
+  viewer.flyTo([satellite, groundTrack], {
+    duration: 1.5,
+    offset: new HeadingPitchRange(0, CesiumMath.toRadians(-35), viewDistanceMeters),
+  });
 
   return {
     satellite,

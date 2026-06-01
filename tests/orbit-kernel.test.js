@@ -11,6 +11,7 @@ test('propagates the configured demo mission into fixed-step samples', () => {
   assert.equal(samples.at(-1).epochSeconds, 10_800);
   assert.ok(samples.every((sample) => Number.isFinite(sample.latitudeDeg)));
   assert.ok(samples.every((sample) => sample.longitudeDeg >= -180 && sample.longitudeDeg <= 180));
+  assert.ok(samples.every((sample) => Math.abs(sample.altitudeKm - demoMission.altitudeKm) < 5));
 });
 
 test('converts an equatorial ECI point at epoch zero to geodetic coordinates', () => {
