@@ -1,5 +1,5 @@
 import { ALTITUDE_KM, buildMissionTimeline, demoMission, demoVisual } from './mission.js';
-import { createViewer, loadMissionScene } from './visualization/cesiumAdapter.js';
+import { createViewer, frameEarthAndOrbit, loadMissionScene } from './visualization/cesiumAdapter.js';
 
 const app = document.querySelector('#app');
 
@@ -22,6 +22,7 @@ app.innerHTML = `
         <div><dt>经度</dt><dd id="lon">-</dd></div>
         <div><dt>高度</dt><dd id="alt">-</dd></div>
       </dl>
+      <button type="button" class="frame-button" id="frameView">对准地球与轨迹</button>
       <div class="architecture">
         <h2>当前框架</h2>
         <ol>
@@ -65,3 +66,8 @@ const renderTelemetry = () => {
 
 viewer.clock.onTick.addEventListener(renderTelemetry);
 renderTelemetry();
+
+document.querySelector('#frameView').addEventListener('click', () => {
+  viewer.trackedEntity = undefined;
+  frameEarthAndOrbit(viewer, demoMission);
+});
