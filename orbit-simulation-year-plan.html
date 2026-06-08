@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>轨道力学仿真软件一年开发与学习计划</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f8fb;
+        --paper: #ffffff;
+        --ink: #172033;
+        --muted: #5f6b7a;
+        --line: #d9e0ea;
+        --primary: #2357d8;
+        --primary-soft: #eaf0ff;
+        --accent: #0e8f78;
+        --accent-soft: #e8f7f4;
+        --warning: #9a6500;
+        --warning-soft: #fff6df;
+        --shadow: 0 18px 60px rgba(22, 35, 58, 0.12);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at top left, rgba(35, 87, 216, 0.13), transparent 34rem),
+          linear-gradient(180deg, #eef3ff 0%, var(--bg) 24rem);
+        color: var(--ink);
+        line-height: 1.72;
+      }
+
+      a {
+        color: var(--primary);
+      }
+
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 28px;
+        align-items: stretch;
+        margin-bottom: 28px;
+      }
+
+      .hero-card,
+      .card {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(217, 224, 234, 0.78);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-card {
+        padding: 40px;
+      }
+
+      .hero h1 {
+        margin: 0 0 16px;
+        font-size: clamp(2rem, 4vw, 3.6rem);
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+      }
+
+      .subtitle {
+        margin: 0;
+        max-width: 780px;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        color: #1d46ad;
+        font-size: 0.92rem;
+        font-weight: 650;
+      }
+
+      .hero-aside {
+        padding: 28px;
+      }
+
+      .hero-aside h2 {
+        margin-top: 0;
+        font-size: 1.2rem;
+      }
+
+      .hero-aside ul {
+        margin: 0;
+        padding-left: 1.25rem;
+      }
+
+      nav.card {
+        padding: 22px 26px;
+        margin-bottom: 28px;
+      }
+
+      nav h2 {
+        margin: 0 0 10px;
+        font-size: 1.05rem;
+      }
+
+      .toc {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .toc a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #f5f7fb;
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 650;
+      }
+
+      .toc a:hover {
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      section.card {
+        padding: 34px;
+        margin: 24px 0;
+      }
+
+      h2 {
+        margin: 0 0 18px;
+        font-size: 1.75rem;
+        letter-spacing: -0.02em;
+      }
+
+      h3 {
+        margin: 26px 0 12px;
+        font-size: 1.2rem;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      .lead {
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .grid-2,
+      .grid-3 {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .mini-card {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fbfcff;
+      }
+
+      .mini-card h3 {
+        margin-top: 0;
+      }
+
+      .mini-card ul,
+      .check-list {
+        margin: 0;
+        padding-left: 1.2rem;
+      }
+
+      .callout {
+        padding: 18px 20px;
+        border-left: 5px solid var(--accent);
+        border-radius: 16px;
+        background: var(--accent-soft);
+        margin: 18px 0;
+      }
+
+      .warning {
+        border-left-color: var(--warning);
+        background: var(--warning-soft);
+      }
+
+      .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 820px;
+      }
+
+      th,
+      td {
+        padding: 13px 15px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+        text-align: left;
+      }
+
+      th {
+        background: #f0f4fb;
+        color: #26364d;
+        font-size: 0.94rem;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .phase {
+        margin: 34px 0 10px;
+        padding: 15px 18px;
+        border-radius: 16px;
+        background: var(--primary-soft);
+        color: #173f9c;
+        font-weight: 800;
+        font-size: 1.12rem;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: #edf2f8;
+        color: #405169;
+        font-size: 0.86rem;
+        font-weight: 650;
+        white-space: nowrap;
+      }
+
+      code,
+      pre {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      }
+
+      pre {
+        overflow-x: auto;
+        padding: 16px;
+        border-radius: 14px;
+        background: #111827;
+        color: #e5e7eb;
+        line-height: 1.5;
+      }
+
+      .footer-note {
+        color: var(--muted);
+        text-align: center;
+        margin-top: 36px;
+      }
+
+      @media (max-width: 900px) {
+        .hero,
+        .grid-2,
+        .grid-3,
+        .toc {
+          grid-template-columns: 1fr;
+        }
+
+        .page {
+          padding: 28px 16px 48px;
+        }
+
+        .hero-card,
+        section.card {
+          padding: 24px;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .page {
+          max-width: none;
+          padding: 0;
+        }
+
+        .hero-card,
+        .card,
+        .hero-aside {
+          box-shadow: none;
+        }
+
+        nav {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero-card">
+          <h1>轨道力学仿真软件一年开发与学习计划</h1>
+          <p class="subtitle">
+            面向已有数值计算与多物理场软件开发基础的学习者：以 Curtis
+            的《Orbital Mechanics for Engineering Students》为理论主线，以
+            Cursor 作为结对工程师、代码审查员与学习助教，在一年内完成一个可验证、可扩展的轨道力学仿真软件原型。
+          </p>
+          <div class="badge-row">
+            <span class="badge">周期：52 周</span>
+            <span class="badge">主参考书：Curtis</span>
+            <span class="badge">主要对标：poliastro 核心子集</span>
+            <span class="badge">辅助工具：Cursor</span>
+          </div>
+        </div>
+        <aside class="hero-aside card">
+          <h2>年度目标一句话</h2>
+          <p>
+            做一个以 Curtis 为理论主线、以 poliastro 为功能对标、以 Orekit/Tudat
+            为架构参考的轻量级轨道力学仿真软件。
+          </p>
+          <ul>
+            <li>能传播轨道</li>
+            <li>能建模基础摄动力</li>
+            <li>能进行机动与转移分析</li>
+            <li>能输出可视化与验证报告</li>
+          </ul>
+        </aside>
+      </header>
+
+      <nav class="card" aria-label="目录">
+        <h2>目录</h2>
+        <ul class="toc">
+          <li><a href="#positioning">目标定位</a></li>
+          <li><a href="#benchmark">开源软件对标</a></li>
+          <li><a href="#year-plan">52 周计划</a></li>
+          <li><a href="#curtis">Curtis 阅读主线</a></li>
+          <li><a href="#cursor">Cursor 使用方式</a></li>
+          <li><a href="#deliverables">最终交付物</a></li>
+          <li><a href="#weekly-rhythm">每周节奏</a></li>
+          <li><a href="#success">成功标准</a></li>
+        </ul>
+      </nav>
+
+      <section id="positioning" class="card">
+        <h2>1. 目标定位</h2>
+        <p class="lead">
+          目标不是一年内复刻 GMAT、Orekit、STK 或 Tudat，而是完成一个结构清晰、算法可信、测试充分、可继续扩展的轨道动力学仿真平台原型。
+        </p>
+        <div class="grid-3">
+          <div class="mini-card">
+            <h3>学习目标</h3>
+            <ul>
+              <li>掌握二体问题、轨道根数、Kepler 传播</li>
+              <li>理解时间系统、坐标系统与常见误差来源</li>
+              <li>建立基础摄动力与任务分析能力</li>
+            </ul>
+          </div>
+          <div class="mini-card">
+            <h3>开发目标</h3>
+            <ul>
+              <li>形成可安装、可测试的软件包</li>
+              <li>实现传播器、力模型、机动、事件检测</li>
+              <li>支持配置文件、CLI、结果输出和可视化</li>
+            </ul>
+          </div>
+          <div class="mini-card">
+            <h3>工程目标</h3>
+            <ul>
+              <li>每个模型说明单位、坐标系和假设</li>
+              <li>关键算法有解析解或开源软件对比</li>
+              <li>用文档和验证报告支撑可信度</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>核心原则：</strong>每个模型都必须有来源、单位、坐标系假设、验证案例和误差说明。
+        </div>
+      </section>
+
+      <section id="benchmark" class="card">
+        <h2>2. 一年工作量下的开源软件对标</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>软件</th>
+                <th>对标方式</th>
+                <th>一年内目标</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>poliastro</strong></td>
+                <td>主要对标功能与 Python API 风格</td>
+                <td>对标核心子集：二体传播、基础摄动、机动、Lambert、可视化</td>
+              </tr>
+              <tr>
+                <td><strong>TudatPy</strong></td>
+                <td>参考任务建模、传播器、环境模型组织方式</td>
+                <td>参考架构，不追求完整功能覆盖</td>
+              </tr>
+              <tr>
+                <td><strong>Orekit</strong></td>
+                <td>参考工程抽象、时间系统、坐标系统与验证思想</td>
+                <td>作为长期学习对象，不作为一年内完整对标目标</td>
+              </tr>
+              <tr>
+                <td><strong>GMAT</strong></td>
+                <td>作为任务分析结果的外部验证参考</td>
+                <td>用于少量典型案例对比，不复刻 GUI 或完整任务系统</td>
+              </tr>
+              <tr>
+                <td><strong>Astropy</strong></td>
+                <td>参考或复用时间、单位、坐标思想</td>
+                <td>可作为依赖或验证工具</td>
+              </tr>
+              <tr>
+                <td><strong>SPICE / SpiceyPy</strong></td>
+                <td>参考星历、天体位置和深空任务数据处理</td>
+                <td>后期可接入，不作为 MVP 必需项</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warning callout">
+          <strong>建议：</strong>一年个人工作量最适合对标 poliastro 的核心轨道力学能力子集；Orekit、Tudat 和 GMAT 更适合作为架构与验证参考。
+        </div>
+      </section>
+
+      <section id="year-plan" class="card">
+        <h2>3. 52 周详细计划</h2>
+        <p class="lead">
+          每个阶段都让学习、实现、测试、验证同步推进。下面的安排可以按项目实际进展微调，但建议不要跳过验证体系。
+        </p>
+
+        <div class="phase">第 1-4 周：项目基础与轨道力学复习</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 1 周</td>
+                <td>Curtis 第 1 章：矢量、牛顿力学、二体问题基础</td>
+                <td>建立仓库、测试框架、代码风格、文档结构</td>
+                <td>项目骨架</td>
+              </tr>
+              <tr>
+                <td>第 2 周</td>
+                <td>Curtis 第 2 章：二体轨道、能量、角动量</td>
+                <td>定义 StateVector、OrbitElements、常数、单位系统</td>
+                <td>状态量模块</td>
+              </tr>
+              <tr>
+                <td>第 3 周</td>
+                <td>圆轨道、椭圆轨道、轨道根数含义</td>
+                <td>实现轨道根数到笛卡尔状态转换</td>
+                <td>根数转换初版</td>
+              </tr>
+              <tr>
+                <td>第 4 周</td>
+                <td>反向转换、特殊轨道情况</td>
+                <td>实现笛卡尔状态到轨道根数转换</td>
+                <td>转换测试集</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 5-8 周：Kepler 传播与解析轨道</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 5 周</td>
+                <td>Curtis 第 3 章：真近点角、偏近点角、平近点角</td>
+                <td>实现异常角转换函数</td>
+                <td>anomaly 模块</td>
+              </tr>
+              <tr>
+                <td>第 6 周</td>
+                <td>Kepler 方程数值求解</td>
+                <td>实现 Newton / Halley 求解器</td>
+                <td>Kepler solver</td>
+              </tr>
+              <tr>
+                <td>第 7 周</td>
+                <td>椭圆轨道位置随时间变化</td>
+                <td>实现二体解析传播器</td>
+                <td>KeplerPropagator</td>
+              </tr>
+              <tr>
+                <td>第 8 周</td>
+                <td>双曲线轨道基础</td>
+                <td>增加椭圆 / 双曲线测试，与 poliastro 对比</td>
+                <td>二体传播验证报告</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 9-12 周：数值积分器与传播框架</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 9 周</td>
+                <td>常微分方程数值积分复习</td>
+                <td>实现 RK4</td>
+                <td>基础积分器</td>
+              </tr>
+              <tr>
+                <td>第 10 周</td>
+                <td>自适应步长、误差控制</td>
+                <td>实现 RK45 或接入 SciPy DOP853</td>
+                <td>自适应传播器</td>
+              </tr>
+              <tr>
+                <td>第 11 周</td>
+                <td>状态方程建模</td>
+                <td>设计 DynamicsModel / ForceModel 接口</td>
+                <td>动力学框架</td>
+              </tr>
+              <tr>
+                <td>第 12 周</td>
+                <td>误差评估方法</td>
+                <td>二体数值传播与解析传播对比</td>
+                <td>数值传播验证</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 13-16 周：时间系统与坐标系统基础</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 13 周</td>
+                <td>Julian Date、UTC、TT、TAI 基础</td>
+                <td>实现 Epoch、Julian Date 转换</td>
+                <td>时间模块初版</td>
+              </tr>
+              <tr>
+                <td>第 14 周</td>
+                <td>ECI / ECEF 基础</td>
+                <td>实现简化地球自转模型</td>
+                <td>ECI ↔ ECEF</td>
+              </tr>
+              <tr>
+                <td>第 15 周</td>
+                <td>RTN / LVLH 坐标系</td>
+                <td>实现局部轨道坐标转换</td>
+                <td>RTN/LVLH 模块</td>
+              </tr>
+              <tr>
+                <td>第 16 周</td>
+                <td>坐标转换误差来源</td>
+                <td>与 Astropy / poliastro 对比</td>
+                <td>坐标验证案例</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 17-22 周：摄动力模型</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 17 周</td>
+                <td>J2 摄动理论</td>
+                <td>实现 J2 加速度</td>
+                <td>J2Gravity</td>
+              </tr>
+              <tr>
+                <td>第 18 周</td>
+                <td>RAAN 进动解析近似</td>
+                <td>用 SSO / LEO 验证 J2</td>
+                <td>J2 验证报告</td>
+              </tr>
+              <tr>
+                <td>第 19 周</td>
+                <td>大气阻力基础</td>
+                <td>实现指数大气模型</td>
+                <td>AtmosphericDrag</td>
+              </tr>
+              <tr>
+                <td>第 20 周</td>
+                <td>阻力导致轨道衰减</td>
+                <td>验证半长轴衰减趋势</td>
+                <td>阻力案例</td>
+              </tr>
+              <tr>
+                <td>第 21 周</td>
+                <td>第三体摄动</td>
+                <td>实现太阳/月球简化第三体摄动</td>
+                <td>ThirdBodyGravity</td>
+              </tr>
+              <tr>
+                <td>第 22 周</td>
+                <td>太阳光压基础</td>
+                <td>实现 cannonball SRP 模型</td>
+                <td>SolarRadiationPressure</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 23-28 周：轨道机动与转移</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 23 周</td>
+                <td>Curtis 第 6 章：Hohmann 转移</td>
+                <td>实现 Hohmann 计算器</td>
+                <td>Hohmann 示例</td>
+              </tr>
+              <tr>
+                <td>第 24 周</td>
+                <td>平面变轨、组合机动</td>
+                <td>实现脉冲机动模型</td>
+                <td>ImpulseManeuver</td>
+              </tr>
+              <tr>
+                <td>第 25 周</td>
+                <td>多段传播</td>
+                <td>实现 propagation segment</td>
+                <td>多段任务传播</td>
+              </tr>
+              <tr>
+                <td>第 26 周</td>
+                <td>Lambert 问题理论</td>
+                <td>实现基础 Lambert 求解器</td>
+                <td>Lambert 初版</td>
+              </tr>
+              <tr>
+                <td>第 27 周</td>
+                <td>Lambert 多场景验证</td>
+                <td>与 poliastro / lamberthub 对比</td>
+                <td>Lambert 验证</td>
+              </tr>
+              <tr>
+                <td>第 28 周</td>
+                <td>GTO/GEO 转移</td>
+                <td>做一个完整转移任务案例</td>
+                <td>转移任务 demo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 29-34 周：事件检测、地面轨迹与可见性</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 29 周</td>
+                <td>事件函数、根查找</td>
+                <td>实现通用事件检测框架</td>
+                <td>EventDetector</td>
+              </tr>
+              <tr>
+                <td>第 30 周</td>
+                <td>近地点、远地点、节点事件</td>
+                <td>实现 apsis/node detector</td>
+                <td>轨道事件案例</td>
+              </tr>
+              <tr>
+                <td>第 31 周</td>
+                <td>地面轨迹原理</td>
+                <td>实现经纬度转换与 ground track</td>
+                <td>地面轨迹图</td>
+              </tr>
+              <tr>
+                <td>第 32 周</td>
+                <td>地面站坐标</td>
+                <td>实现站点 az/el/range</td>
+                <td>地面站模块</td>
+              </tr>
+              <tr>
+                <td>第 33 周</td>
+                <td>可见性窗口</td>
+                <td>实现 elevation mask 事件</td>
+                <td>可见窗口计算</td>
+              </tr>
+              <tr>
+                <td>第 34 周</td>
+                <td>日照与地影基础</td>
+                <td>实现简化 eclipse detector</td>
+                <td>地影事件案例</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 35-40 周：配置文件、CLI、数据输出与可视化</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 35 周</td>
+                <td>软件输入输出设计</td>
+                <td>设计 YAML / JSON 配置格式</td>
+                <td>case 文件格式</td>
+              </tr>
+              <tr>
+                <td>第 36 周</td>
+                <td>CLI 设计</td>
+                <td>实现 orbit run case.yaml</td>
+                <td>命令行入口</td>
+              </tr>
+              <tr>
+                <td>第 37 周</td>
+                <td>数据格式</td>
+                <td>支持 CSV / JSON / HDF5 输出</td>
+                <td>结果输出模块</td>
+              </tr>
+              <tr>
+                <td>第 38 周</td>
+                <td>轨道可视化</td>
+                <td>实现 2D/3D 轨道图</td>
+                <td>plot 模块</td>
+              </tr>
+              <tr>
+                <td>第 39 周</td>
+                <td>轨道根数随时间变化</td>
+                <td>绘制 a/e/i/RAAN/argp/nu 曲线</td>
+                <td>分析图表</td>
+              </tr>
+              <tr>
+                <td>第 40 周</td>
+                <td>示例整理</td>
+                <td>做 3-5 个完整示例</td>
+                <td>examples 目录</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 41-46 周：验证体系与软件可靠性</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 41 周</td>
+                <td>误差预算方法</td>
+                <td>建立 validation 目录</td>
+                <td>验证框架</td>
+              </tr>
+              <tr>
+                <td>第 42 周</td>
+                <td>与解析解对比</td>
+                <td>二体、J2、Hohmann 验证</td>
+                <td>解析验证</td>
+              </tr>
+              <tr>
+                <td>第 43 周</td>
+                <td>与开源软件对比</td>
+                <td>与 poliastro / GMAT / Orekit 对比</td>
+                <td>对比脚本</td>
+              </tr>
+              <tr>
+                <td>第 44 周</td>
+                <td>单元测试覆盖</td>
+                <td>增加边界情况测试</td>
+                <td>测试覆盖提升</td>
+              </tr>
+              <tr>
+                <td>第 45 周</td>
+                <td>数值稳定性</td>
+                <td>长时间传播误差测试</td>
+                <td>稳定性报告</td>
+              </tr>
+              <tr>
+                <td>第 46 周</td>
+                <td>API 清理</td>
+                <td>重构接口、统一命名和单位</td>
+                <td>v0.1 API</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="phase">第 47-52 周：作品化与高级方向选择</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周次</th>
+                <th>学习重点</th>
+                <th>开发任务</th>
+                <th>产出</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 47 周</td>
+                <td>软件文档写法</td>
+                <td>编写 quickstart、API 文档</td>
+                <td>用户文档</td>
+              </tr>
+              <tr>
+                <td>第 48 周</td>
+                <td>技术设计总结</td>
+                <td>写架构说明、模型假设说明</td>
+                <td>设计文档</td>
+              </tr>
+              <tr>
+                <td>第 49 周</td>
+                <td>选择一个高级方向</td>
+                <td>高精度传播 / 轨道确定 / 相对运动三选一</td>
+                <td>扩展计划</td>
+              </tr>
+              <tr>
+                <td>第 50 周</td>
+                <td>高级方向局部学习</td>
+                <td>实现一个高级小功能，例如 SGP4、CW 方程或 EGM 简化版</td>
+                <td>高级 demo</td>
+              </tr>
+              <tr>
+                <td>第 51 周</td>
+                <td>完整案例打磨</td>
+                <td>做一个端到端任务分析案例</td>
+                <td>showcase</td>
+              </tr>
+              <tr>
+                <td>第 52 周</td>
+                <td>总结与发布</td>
+                <td>打 tag、整理 README、写项目总结</td>
+                <td>v1.0 原型</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="curtis" class="card">
+        <h2>4. Curtis 阅读主线</h2>
+        <p class="lead">
+          《Orbital Mechanics for Engineering Students》适合作为年度主线。它的优势是二体问题、轨道几何、Kepler 传播、机动和 Lambert 问题清晰；高精度时间系统、坐标系统和摄动力工程细节需要用 Vallado、Montenbruck & Gill 与开源软件文档补足。
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>阶段</th>
+                <th>Curtis 重点</th>
+                <th>补充材料建议</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第 1-4 周</td>
+                <td>二体问题、轨道几何、能量与角动量守恒</td>
+                <td>用 poliastro 示例验证根数转换</td>
+              </tr>
+              <tr>
+                <td>第 5-8 周</td>
+                <td>位置随时间变化、Kepler 方程、异常角转换</td>
+                <td>参考 Vallado 的特殊轨道处理</td>
+              </tr>
+              <tr>
+                <td>第 9-12 周</td>
+                <td>把二体动力学写成数值积分问题</td>
+                <td>复习自适应 RK 与误差控制</td>
+              </tr>
+              <tr>
+                <td>第 17-22 周</td>
+                <td>Curtis 中的摄动基础</td>
+                <td>补 Montenbruck & Gill、Orekit 文档</td>
+              </tr>
+              <tr>
+                <td>第 23-28 周</td>
+                <td>轨道机动、Hohmann、Lambert 问题</td>
+                <td>与 lamberthub / poliastro 做数值对比</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="cursor" class="card">
+        <h2>5. Cursor 使用方式</h2>
+        <div class="grid-2">
+          <div class="mini-card">
+            <h3>开发时</h3>
+            <ul>
+              <li>根据接口设计生成初版代码</li>
+              <li>为公式实现补充单元测试</li>
+              <li>检查单位、符号、坐标系和边界条件</li>
+              <li>帮助重构 ForceModel、Propagator、EventDetector 等接口</li>
+              <li>生成验证报告和示例文档草稿</li>
+            </ul>
+          </div>
+          <div class="mini-card">
+            <h3>学习时</h3>
+            <ul>
+              <li>把 Curtis 公式翻译成工程实现步骤</li>
+              <li>解释推导中的物理意义和数值风险</li>
+              <li>生成练习题与代码 kata</li>
+              <li>对比 Orekit、Tudat、poliastro 的接口设计</li>
+              <li>整理每周阅读笔记</li>
+            </ul>
+          </div>
+        </div>
+        <h3>推荐提示词</h3>
+        <pre><code>请根据 Curtis 中经典轨道根数与笛卡尔状态转换公式，
+帮我实现 Python 函数，并补充圆轨道、赤道轨道、近抛物线轨道的单元测试。</code></pre>
+        <pre><code>请检查这个 J2 摄动力实现是否存在单位、符号或坐标系错误，
+并给出可验证的测试案例。</code></pre>
+        <pre><code>请帮我设计一个轨道传播软件的 ForceModel 抽象接口，
+要求支持多个摄动力叠加、参数管理和后续 C++ 迁移。</code></pre>
+      </section>
+
+      <section id="deliverables" class="card">
+        <h2>6. 最终交付物</h2>
+        <div class="grid-2">
+          <div class="mini-card">
+            <h3>必须完成</h3>
+            <ul class="check-list">
+              <li>二体解析传播与数值传播</li>
+              <li>轨道根数与笛卡尔状态转换</li>
+              <li>RK4 / RK45 / DOP853 传播能力</li>
+              <li>J2、大气阻力、第三体摄动、太阳光压简化模型</li>
+              <li>脉冲机动、Hohmann、Lambert</li>
+              <li>ECI/ECEF/RTN/LVLH 转换</li>
+              <li>地面轨迹、事件检测、基础可见性</li>
+              <li>CLI 或配置文件驱动仿真</li>
+              <li>验证案例、文档和示例</li>
+            </ul>
+          </div>
+          <div class="mini-card">
+            <h3>可选增强</h3>
+            <ul class="check-list">
+              <li>SGP4/TLE 支持</li>
+              <li>高阶重力场</li>
+              <li>NRLMSISE-00 或更高保真大气模型</li>
+              <li>SPICE 星历接入</li>
+              <li>轨道确定：最小二乘、EKF、UKF</li>
+              <li>相对运动：CW 方程、编队飞行</li>
+              <li>多目标优化和差分校正</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="weekly-rhythm" class="card">
+        <h2>7. 每周固定节奏建议</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>周内节奏</th>
+                <th>工作内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="pill">第 1-2 天</span></td>
+                <td>读书、推导公式、写学习笔记，明确输入输出、单位和坐标系。</td>
+              </tr>
+              <tr>
+                <td><span class="pill">第 3-4 天</span></td>
+                <td>实现核心算法与接口，保持代码小步提交。</td>
+              </tr>
+              <tr>
+                <td><span class="pill">第 5 天</span></td>
+                <td>写单元测试、边界测试和异常情况测试。</td>
+              </tr>
+              <tr>
+                <td><span class="pill">第 6 天</span></td>
+                <td>与解析解、poliastro、GMAT、Orekit 或 Astropy 对比。</td>
+              </tr>
+              <tr>
+                <td><span class="pill">第 7 天</span></td>
+                <td>整理文档，让 Cursor 做 code review，并更新验证报告。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="success" class="card">
+        <h2>8. 一年后的成功标准</h2>
+        <div class="callout">
+          一年结束时，如果项目具备“可安装、可运行、可验证、可展示、可继续扩展”五个特征，就已经达到非常好的个人项目成果。
+        </div>
+        <ul class="check-list">
+          <li>有一个可安装 Python 包或清晰的软件仓库</li>
+          <li>有稳定 API 和 5-10 个完整示例</li>
+          <li>具备二体、J2、阻力、机动、Lambert、地面轨迹能力</li>
+          <li>能与 poliastro / GMAT / Orekit 做部分结果对比</li>
+          <li>文档说明每个模型的假设、单位、坐标系和误差来源</li>
+          <li>形成项目总结、验证报告或技术博客</li>
+        </ul>
+        <p class="footer-note">
+          建议把“可信度”放在“功能数量”之前：少而可靠的模型，比多而无法验证的模型更接近专业轨道仿真软件。
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
