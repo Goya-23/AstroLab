@@ -9,7 +9,8 @@
 #
 # 说明:
 #   - 统计对象为命令进程及其整棵子进程树（更接近“这个程序”的真实占用）。
-#   - CPU% 按“占用核数 * 100”计算，多核程序可超过 100。
+#   - CPU 占用按“占用核数 * 100”计算（100% = 占满 1 核，多核可超过 100）。
+#   - CPU 占用率 = CPU 占用 / 系统总核数，表示占全机 CPU 资源的比例（0~100%）。
 #   - 内存使用物理内存 RSS（VmRSS）之和，单位 MiB；占用率 = RSS / 系统 MemTotal。
 
 set -euo pipefail
@@ -145,6 +146,16 @@ sample_tree() {
 PAGE_SIZE="$(getconf PAGESIZE)"
 CLK_TCK="$(getconf CLK_TCK)"
 
+# 在线 CPU 核数，用于计算占系统总 CPU 资源的占用率
+NCPU="$(getconf _NPROCESSORS_ONLN 2>/dev/null || true)"
+if [[ -z "$NCPU" || "$NCPU" -le 0 ]]; then
+  NCPU="$(nproc 2>/dev/null || true)"
+fi
+if [[ -z "$NCPU" || "$NCPU" -le 0 ]]; then
+  echo "错误: 无法获取系统 CPU 核数" >&2
+  exit 1
+fi
+
 # 系统总内存（kB -> bytes），用于计算内存占用率
 MEM_TOTAL_KB="$(awk '/^MemTotal:/ { print $2; exit }' /proc/meminfo)"
 if [[ -z "$MEM_TOTAL_KB" || "$MEM_TOTAL_KB" -le 0 ]]; then
@@ -254,9 +265,14 @@ fi
 if [[ "$cpu_samples" -gt 0 ]]; then
   avg_cpu="$(awk -v s="$sum_cpu" -v n="$cpu_samples" 'BEGIN { printf "%.3f", s / n }')"
   peak_cpu_fmt="$(awk -v p="$peak_cpu" 'BEGIN { printf "%.3f", p }')"
+  # 占系统总 CPU 资源比例：单核 100% 占用在 N 核机器上约为 100/N %
+  avg_cpu_sys_pct="$(awk -v v="$avg_cpu" -v n="$NCPU" 'BEGIN { printf "%.3f", v / n }')"
+  peak_cpu_sys_pct="$(awk -v v="$peak_cpu_fmt" -v n="$NCPU" 'BEGIN { printf "%.3f", v / n }')"
 else
   avg_cpu="N/A"
   peak_cpu_fmt="N/A"
+  avg_cpu_sys_pct="N/A"
+  peak_cpu_sys_pct="N/A"
 fi
 
 avg_rss_mib="$(awk -v s="$sum_rss_pages" -v n="$mem_samples" -v ps="$PAGE_SIZE" \
@@ -281,9 +297,12 @@ cat <<EOF
 内存采样次数:   $mem_samples
 CPU 采样次数:   $cpu_samples
 配置采样间隔:   ${INTERVAL}s (约 ${hz} Hz；CPU 最小窗口 $((MIN_CPU_DT_NS / 1000000))ms)
+系统 CPU 总核数: ${NCPU}
 系统总内存:     ${mem_total_mib} MiB
-CPU 平均占用:   ${avg_cpu}%
-CPU 峰值占用:   ${peak_cpu_fmt}%
+CPU 平均占用:   ${avg_cpu}%   (100% = 占满 1 核)
+CPU 峰值占用:   ${peak_cpu_fmt}%   (100% = 占满 1 核)
+CPU 平均占用率: ${avg_cpu_sys_pct}%   (占系统总 CPU)
+CPU 峰值占用率: ${peak_cpu_sys_pct}%   (占系统总 CPU)
 内存平均 RSS:   ${avg_rss_mib} MiB
 内存峰值 RSS:   ${peak_rss_mib} MiB
 内存平均占用率: ${avg_rss_pct}%
