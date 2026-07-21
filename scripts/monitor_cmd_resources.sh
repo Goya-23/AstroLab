@@ -10,7 +10,7 @@
 # 说明:
 #   - 统计对象为命令进程及其整棵子进程树（更接近“这个程序”的真实占用）。
 #   - CPU% 按“占用核数 * 100”计算，多核程序可超过 100。
-#   - 内存使用物理内存 RSS（VmRSS）之和，单位 MiB。
+#   - 内存使用物理内存 RSS（VmRSS）之和，单位 MiB；占用率 = RSS / 系统 MemTotal。
 
 set -euo pipefail
 
@@ -145,6 +145,14 @@ sample_tree() {
 PAGE_SIZE="$(getconf PAGESIZE)"
 CLK_TCK="$(getconf CLK_TCK)"
 
+# 系统总内存（kB -> bytes），用于计算内存占用率
+MEM_TOTAL_KB="$(awk '/^MemTotal:/ { print $2; exit }' /proc/meminfo)"
+if [[ -z "$MEM_TOTAL_KB" || "$MEM_TOTAL_KB" -le 0 ]]; then
+  echo "错误: 无法读取 /proc/meminfo 中的 MemTotal" >&2
+  exit 1
+fi
+MEM_TOTAL_BYTES=$((MEM_TOTAL_KB * 1024))
+
 # 启动目标命令；独立进程组，便于统一回收
 set +e
 setsid "$@" &
@@ -255,6 +263,11 @@ avg_rss_mib="$(awk -v s="$sum_rss_pages" -v n="$mem_samples" -v ps="$PAGE_SIZE" 
   'BEGIN { printf "%.3f", (s / n) * ps / 1024 / 1024 }')"
 peak_rss_mib="$(awk -v p="$peak_rss_pages" -v ps="$PAGE_SIZE" \
   'BEGIN { printf "%.3f", p * ps / 1024 / 1024 }')"
+avg_rss_pct="$(awk -v s="$sum_rss_pages" -v n="$mem_samples" -v ps="$PAGE_SIZE" -v tot="$MEM_TOTAL_BYTES" \
+  'BEGIN { printf "%.3f", ((s / n) * ps * 100.0) / tot }')"
+peak_rss_pct="$(awk -v p="$peak_rss_pages" -v ps="$PAGE_SIZE" -v tot="$MEM_TOTAL_BYTES" \
+  'BEGIN { printf "%.3f", (p * ps * 100.0) / tot }')"
+mem_total_mib="$(awk -v tot="$MEM_TOTAL_BYTES" 'BEGIN { printf "%.1f", tot / 1024 / 1024 }')"
 
 hz="$(awk -v iv="$INTERVAL" 'BEGIN {
   if (iv + 0 > 0) printf "%.1f", 1.0 / iv;
@@ -268,10 +281,13 @@ cat <<EOF
 内存采样次数:   $mem_samples
 CPU 采样次数:   $cpu_samples
 配置采样间隔:   ${INTERVAL}s (约 ${hz} Hz；CPU 最小窗口 $((MIN_CPU_DT_NS / 1000000))ms)
+系统总内存:     ${mem_total_mib} MiB
 CPU 平均占用:   ${avg_cpu}%
 CPU 峰值占用:   ${peak_cpu_fmt}%
 内存平均 RSS:   ${avg_rss_mib} MiB
 内存峰值 RSS:   ${peak_rss_mib} MiB
+内存平均占用率: ${avg_rss_pct}%
+内存峰值占用率: ${peak_rss_pct}%
 ==============================
 EOF
 
