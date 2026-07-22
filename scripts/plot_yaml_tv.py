@@ -18,18 +18,16 @@ def main():
     for k in args.key.split("."):
         node = node[k]
     rows = list(node)
-    t, v1, v2, v3 = zip(*rows)
-
-    plt.plot(t, v1, label="v1")
-    plt.plot(t, v2, label="v2")
-    plt.plot(t, v3, label="v3")
-    plt.xlabel("t")
-    plt.ylabel("v")
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
+    t, *vs = zip(*rows)
+    fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 7))
+    for ax, v, name in zip(axes, vs, ("v1", "v2", "v3")):
+        ax.plot(t, v)
+        ax.set_ylabel(name)
+        ax.grid(True, alpha=0.3)
+    axes[-1].set_xlabel("t")
+    fig.tight_layout()
     if args.output:
-        plt.savefig(args.output, dpi=150)
+        fig.savefig(args.output, dpi=150)
     else:
         plt.show()
 
