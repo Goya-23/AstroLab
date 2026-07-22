@@ -22,6 +22,7 @@ def main():
     fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 7))
     for ax, v, name in zip(axes, vs, ("v1", "v2", "v3")):
         ax.plot(t, v)
+        ax.set_title(name)
         ax.set_ylabel(name)
         ax.grid(True, alpha=0.3)
     axes[-1].set_xlabel("t")
